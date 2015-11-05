@@ -12,7 +12,7 @@ class Menu extends React.Component {
                     let menu = [];
                     let items = this.props.items;
                     for (key in items) {
-                        let submenu = (items[key].name.search('Menu') > 0)? new items[key]() : null;
+                        let submenu = (items[key].render )? new items[key]() : null;
                         let item = <MenuItem label={key} submenu={submenu} />;
                         
                         menu.push(item);
