@@ -5,7 +5,7 @@ import Menu from './menu';
 
 class WinesMenu extends React.Component {
     render() {
-        return <Menu items={{'New Party': newParty }} />
+        return <Menu items={{'New Party': () => { console.log('hello'); }  }} />
     }
 }
 

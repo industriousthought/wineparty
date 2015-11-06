@@ -1,14 +1,18 @@
-// menu.jsx
+// topmenu.jsx
 
 import React from 'react';
 import Menu from './menu';
 import People from './peoplemenu';
-import Parties from './partiesmenu';
+import PartiesMenu from './partiesmenu';
 import Wines from './winesmenu';
 
 class TopMenu extends React.Component {
     render() {
-        return <Menu items={{'People': () => { console.log('hello') } , 'Parties': new Parties (), 'Wines': () => { console.log('hello') }}}/>;
+        return <Menu items={{
+            'People': () => { console.log('hello') } , 
+            'Parties': <PartiesMenu parent={this.props.parent} showDialog={this.props.showDialog} />, 
+            'Wines': this.props.showDialog.bind(this.props.parent, 'ratewine') 
+        }}/>;
     }
 }
 

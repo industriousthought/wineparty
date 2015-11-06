@@ -1,0 +1,31 @@
+body {
+    background-color: #CCCCFF;
+}
+
+ul > li {
+    list-style-type: none;
+}
+
+.collapsed {
+    max-height: 0px !important;
+}
+
+.expanded {
+}
+
+.subContainer {
+    max-height: 50px;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.dialog {
+    max-height: 90%;
+    height: 90%;
+    overflow: hidden;
+    z-index: 1;
+    width: 90%;
+    position: absolute;
+    background-color: #FFFFFF;
+    transition: 0.5s;
+}
