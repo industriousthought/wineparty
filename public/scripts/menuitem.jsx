@@ -7,27 +7,32 @@ class MenuItem extends React.Component {
         super(props);
         this.state = {visibility: 'collapsed'};
     }
+    clickItem() {
+        if (this.props.clickEvent) this.props.clickEvent();
+        if (this.props.submenu) {
+            this.toggleSubmenu();
+        }
+    }
+    toggleSubmenu() {
+        if (this.state.visibility === 'collapsed') {
+            this.setState({visibility: ''});
+        } else {
+            this.setState({visibility: 'collapsed'});
+        }
+    }
     render() {
-        let clickItem = () => {
-            if (this.props.clickEvent) this.props.clickEvent();
-            if (this.props.submenu) {
-                if (this.state.visibility === 'collapsed') {
-                    this.setState({visibility: ''});
-                } else {
-                    this.setState({visibility: 'collapsed'});
-                }
-            }
-        };
         return (
             <li> 
-                <span onClick={clickItem}>
+                <span onClick={this.clickItem.bind(this)}>
                     {this.props.label}
                 </span>
-                <div className={'subContainer ' + this.state.visibility}>
                     { (() => {
-                        if (this.props.submenu) return this.props.submenu;
+                        if (this.props.submenu) return (
+                            <div className={'subContainer ' + this.state.visibility}>
+                                {this.props.submenu}
+                            </div>
+                        );
                     }) () }
-                </div>
             </li>
         )
     }

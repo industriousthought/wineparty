@@ -6,6 +6,10 @@ ul > li {
     list-style-type: none;
 }
 
+.closeDialog{
+    float: right;
+}
+
 .collapsed {
     max-height: 0px !important;
 }
@@ -28,4 +32,33 @@ ul > li {
     position: absolute;
     background-color: #FFFFFF;
     transition: 0.5s;
+}
+
+.pickedFriend {
+    border: 1px solid black;
+}
+
+.friendItem {
+    display: inline-block;
+    width: 200px;
+}
+
+.innerDialog {
+    overflow: auto;
+    height: 100%;
+}
+
+.hidden {
+    height: 0px !important;
+    border: 0px solid black !important;
+}
+
+.date-picker {
+    max-height: 200px;
+    height: 200px;
+    transition: 0.5s;
+    position: fixed;
+    overflow: hidden;
+    background: #FFFFFF;
+    border: 1px solid black;
 }

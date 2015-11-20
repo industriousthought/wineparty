@@ -2,10 +2,11 @@ var mongoose = require('mongoose');
 
 var ArticleSchema = new mongoose.Schema({
       id: String,
-      host: String,
-      invited: String,
-      RSVP: String,
-      date: Date,
+      uid: String,
+      RSVP: [],
+      invites: [],
+      wines: [],
+      dateTime: Date,
       location: String
 });
 

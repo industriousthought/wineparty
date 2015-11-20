@@ -16,12 +16,13 @@ var bodyParser = require('body-parser');
 var config = require('./oauth');
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
+var FacebookCanvasStrategy = require('passport-facebook-canvas');
 var ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 var session = require('express-session');
 var uuid = require('node-uuid').v1;
 var mongoose = require('mongoose');
 
-var friends = require('./routes/friends');
+//var wines = require('./routes/wines');
 var index = require('./routes/index');
 var parties = require('./routes/parties');
 var canvasApp = require('./routes/canvasApp');
@@ -56,15 +57,30 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-app.use('/friends', friends);
+//app.use('/wines', wines);
 app.use('/', index);
 app.use('/canvasApp', canvasApp);
 app.use('/parties', parties);
 
+
+passport.use(new FacebookCanvasStrategy({
+    clientID: config.clientID,
+    clientSecret: config.clientSecret,
+    callbackURL: 'https://www.industriousthought.com/auth/facebook-canvas/callback'
+},
+function(accessToken, refreshToken, profile, done) {
+
+    profile.accessToken = accessToken;
+    process.nextTick(function() {
+        done(null, profile);
+    });
+}
+));
+
 passport.use(new FacebookStrategy({
     clientID: config.clientID,
     clientSecret: config.clientSecret,
-    callbackURL: config.callbackURL
+    callbackURL: 'https://www.industriousthought.com/auth/facebook/callback'
 }, function(accessToken, refreshToken, profile, done) {
 
     profile.accessToken = accessToken;
@@ -82,15 +98,39 @@ passport.deserializeUser(function(obj, done) {
 });
 
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: 'user_friends' }));
+app.get('/auth/facebook-canvas', passport.authenticate('facebook-canvas', { scope: 'user_friends' }));
 
 app.get('/auth/facebook/callback', passport.authenticate('facebook', {
     successRedirect: '/success',
     failureRedirect: '/error'
 }));
 
+app.get('/auth/facebook-canvas/callback', passport.authenticate('facebook-canvas', {
+    successRedirect: '/success',
+    failureRedirect: '/auth/facebook-canvas/autologin'
+}));
+
+app.get('/auth/facebook-canvas/autologin', function( req, res ){
+    console.log('autologgggin');
+    res.send( '<!DOCTYPE html>' +
+        '<html>' +
+        '<body>' +
+        '<script type="text/javascript">' +
+        'console.log("replaceing top");' +
+        'top.location.replace("/auth/facebook");' +
+        '</script>' +
+        '</body>' +
+        '</html>' );
+});
+
 app.get('/success', function(req, res, next) {
     if (req.user) { 
-        res.redirect('/');
+        if (req.session && req.session.canvasUser) {
+            console.log('canvasuser');
+            res.redirect('https://apps.facebook.com/industriousthought');
+        } else {
+            res.redirect('/');
+        }
     } else {
         res.render('login', {login: 'fail'});
     }
