@@ -5,6 +5,7 @@ var ArticleSchema = new mongoose.Schema({
       uid: String,
       RSVP: [],
       invites: [],
+      started: {},
       wines: [],
       dateTime: Date,
       location: String

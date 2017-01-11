@@ -68,27 +68,49 @@ router.get('/', function(req, res, next) {
 
 });
 
+router.post('/hosting/:id', function(req, res, next) {
+    party.findOne({_id: req.param('id'), uid: req.user.id}, function(err, party) {
+        party.started = {
+            attending: []
+        };
+        party.save(function(err, party) {
+            res.send(JSON.stringify(party));
+        });
+    });
+
+});
+
 router.get('/hosting/', function(req, res, next) {
     var data = {};
     var count = 0;
     var async = function() {
         count++;
         if (count === 1) {
-            console.log(data);
             res.send(data.hosting);
         }
     };
     getHosting(req.user.id, data, async);
 });
 
-router.post('/attending/:id', function(req, res, next) {
-    party.findOne({_id: req.param('id')}, function(err, doc) {
-        if (doc.RSVP.indexOf(req.user.id) >= 0) {
+router.post('/attending/', function(req, res, next) {
+    party.findOne({_id: req.body.partyId}, function(err, doc) {
+        if (doc && (doc.RSVP.indexOf(req.user.id) >= 0 || doc.uid === req.user.id)) {
             var wine = req.body;
+            var ids = [];
+            var id = 0;
+            doc.wines.forEach(function(currentWine) {
+                ids.push(currentWine.id);
+            });
+            if (ids.length > 0) id = ids.sort()[ids.length - 1] + 1
+            wine.id = id;
             wine.uid = req.user.id;
             doc.wines.push(wine);
             doc.save(function(err, doc) {
-                res.send(JSON.stringify({status: true}));
+                console.log(wine);
+                res.send(JSON.stringify({
+                    status: true,
+                    wine: JSON.stringify(wine)
+                }));
             });
         }
     });
@@ -141,17 +163,34 @@ router.post('/delete/:id', function(req, res, next) {
     });
 });
 
+router.post('/deletewine/', function(req, res, next) {
+    party.findOne({_id: req.body.partyId}, function(err, party) {
+        var index = -1;
+        party.wines.forEach(function(wine, i) {
+            if (wine.id == req.body.wineId) index = i;
+        });
+        if (index >= 0 && party.wines[index].uid == req.user.id) {
+            party.wines.splice(index, 1);
+            party.save();
+            res.send(JSON.stringify({status: true}));
+        }
+    });
+});
+
 router.post('/', function(req, res, next) {
 
     var newParty = new party(req.body);
     newParty.uid = req.user.id;
     newParty.dateTime = new Date(req.body.dateTime);
     newParty.markModified('dateTime');
-    newParty.save(function(err) {
+    newParty.save(function(err, doc) {
         if (err) {
             res.send(JSON.stringify(err));
         } else {
-            res.send(JSON.stringify({status: true}));
+            res.send(JSON.stringify({
+                status: true,
+                party: JSON.stringify(doc)
+            }));
         }
         
 

@@ -3,6 +3,7 @@
 import React from 'react';
 import DateTime from 'react-datetimepicker';
 import PickFriend from './pickfriend';
+import Flux from './flux';
 import req from './req';
 import moment from 'moment';
 window.req = req;
@@ -36,19 +37,12 @@ class CreateParty extends React.Component {
     }
     tryCreateParty(e) {
         e.preventDefault();
-        FB.ui({method: 'apprequests',
-            message: 'YOUR_MESSAGE_HERE',
-            to: this.state.pickedFriends.toString()
-        }, response => {
-            console.log(response);
-            const params = 'location=' + this.refs.location.getDOMNode().value.trim() +
-                '&invites=' + this.state.pickedFriends.toString() +
-                '&dateTime=' + this.state.dateTime;
-            req('/parties/', this.partyCreated, 'POST', params, 'application/x-www-form-urlencoded');
+        Flux.dispatch({
+            action: 'createparty',
+            location: this.refs.location.getDOMNode().value.trim(),
+            invites: this.state.pickedFriends.toString(),
+            dateTime: this.state.dateTime
         });
-    }
-    partyCreated(res) {
-        //console.log(res);
     }
     render() {
         return (
